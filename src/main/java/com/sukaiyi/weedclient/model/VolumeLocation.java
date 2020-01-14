@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VolumeLocation {
-
+    private String volumeId;
     private List<Location> locations;
 
     @Data

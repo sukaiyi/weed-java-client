@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+/**
+ * @author sukaiyi
+ * @date 2020/01/14
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileStatus {
-    private String fileId;
-    private String contentType;
-    private String fileName;
-    private Long size;
+public class SeaweedSource {
+    private List<String> urls;
 }
