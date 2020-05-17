@@ -1,34 +1,26 @@
-package com.sukaiyi.weedclient;
+package com.sukaiyi.weedclient.core;
 
 import com.sukaiyi.weedclient.model.*;
 
 import java.io.*;
-import java.util.Map;
 
 public interface WeedClientService {
-
-    /**
-     * 初始化
-     *
-     * @param seaweedSource 连接参数
-     */
-    void init(SeaweedSource seaweedSource);
 
     /**
      * 分配FileId
      *
      * @return AssignedFileId
      */
-    AssignedFileId assignFileId() throws IOException;
+    AssignedFileId assignFileId();
 
-    AssignedFileId assignFileId(Map<String, String> params) throws IOException;
+    AssignedFileId assignFileId(AssignFileIdParam param);
 
     /**
      * 查找 volume
      *
      * @return VolumeLocation
      */
-    VolumeLocation lookupVolume(String volumeId) throws IOException;
+    VolumeLocation lookupVolume(String volumeId);
 
     /**
      * 上传文件
@@ -36,7 +28,7 @@ public interface WeedClientService {
      * @param file 文件
      * @return 文件信息
      */
-    FileInfo upload(File file) throws IOException;
+    FileInfo write(File file);
 
     /**
      * 上传文件
@@ -44,7 +36,7 @@ public interface WeedClientService {
      * @param file 文件
      * @return 文件信息
      */
-    FileInfo upload(String fileName, File file) throws IOException;
+    FileInfo write(String fileName, File file);
 
     /**
      * 上传文件
@@ -52,7 +44,7 @@ public interface WeedClientService {
      * @param is 输入流
      * @return 文件信息
      */
-    FileInfo upload(String fileName, InputStream is) throws IOException;
+    FileInfo write(String fileName, InputStream is, AssignedFileId assignedFileId);
 
     /**
      * 读取文件流
@@ -60,7 +52,7 @@ public interface WeedClientService {
      * @param fileId 文件ID
      * @return 文件流
      */
-    InputStream fileStream(String fileId) throws IOException;
+    InputStream read(String fileId);
 
     /**
      * 获取文件地址
@@ -68,7 +60,7 @@ public interface WeedClientService {
      * @param fileId 文件ID
      * @return 文件地址
      */
-    String fileUrl(String fileId) throws IOException;
+    String fileUrl(String fileId);
 
     /**
      * 读取文件信息
@@ -76,12 +68,12 @@ public interface WeedClientService {
      * @param fileId 文件ID
      * @return FileInfo
      */
-    FileInfo fileInfo(String fileId) throws IOException;
+    FileInfo fileInfo(String fileId);
 
     /**
      * 删除文件
      *
      * @param fileId 文件ID
      */
-    void delete(String fileId) throws IOException;
+    void delete(String fileId);
 }

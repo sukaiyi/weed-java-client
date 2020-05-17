@@ -1,6 +1,11 @@
-package com.sukaiyi.weedclient;
+package com.sukaiyi.weedclient.core;
 
 public class WeedRestEndpoint {
+
+    /**
+     * Check System Status
+     */
+    public static final String DIR_STATUS = "/dir/status";
     /**
      * Assign a file key
      */
@@ -25,8 +30,6 @@ public class WeedRestEndpoint {
      * Check System Status
      */
     public static final String CLUSTER_STATUS = "/cluster/status";
-
-
 
 
     private WeedRestEndpoint() {

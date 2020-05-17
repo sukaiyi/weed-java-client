@@ -6,8 +6,8 @@ package com.sukaiyi.weedclient.exception;
  */
 public class SeaweedfsException extends RuntimeException {
 
-    public SeaweedfsException() {
-
+    public SeaweedfsException(Exception e) {
+        super(e);
     }
 
     public SeaweedfsException(String message) {

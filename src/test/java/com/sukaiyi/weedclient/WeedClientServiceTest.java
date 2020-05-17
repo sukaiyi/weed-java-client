@@ -1,38 +1,41 @@
 package com.sukaiyi.weedclient;
 
-import com.sukaiyi.weedclient.model.AssignedFileId;
-import com.sukaiyi.weedclient.model.FileInfo;
-import com.sukaiyi.weedclient.model.SeaweedSource;
-import com.sukaiyi.weedclient.model.VolumeLocation;
+import com.sukaiyi.weedclient.core.WeedClientService;
+import com.sukaiyi.weedclient.core.WeedClientServiceImpl;
+import com.sukaiyi.weedclient.model.*;
 import com.sukaiyi.weedclient.utils.IoUtils;
 import org.junit.jupiter.api.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class WeedClientServiceTest {
 
-    private WeedClientService weedClientService = new WeedClientServiceImpl();
+    private WeedClientService weedClientService;
     private List<String> fileUploaded = new ArrayList<>();
 
-    @BeforeAll
+    @BeforeEach
     void before() {
         fileUploaded.clear();
-        SeaweedSource seaweedSource = new SeaweedSource();
-        seaweedSource.setUrls(Arrays.asList("http://127.0.0.1:9333", "http://127.0.0.1:9334", "http://127.0.0.1:9335"));
-        weedClientService.init(seaweedSource);
+        SeaweedProperties seaweedProperties = new SeaweedProperties();
+        seaweedProperties.setUrls(Arrays.asList("http://127.0.0.1:9333"));
+        weedClientService = new WeedClientServiceImpl(seaweedProperties);
     }
 
-    @AfterAll
-    void after() throws IOException {
+    @AfterEach
+    void after() {
         for (String fileId : fileUploaded) {
             weedClientService.delete(fileId);
         }
     }
 
     @Test
-    void assignFileId() throws IOException {
+    @Order(1)
+    void assignFileId() {
         AssignedFileId assignedFileId = weedClientService.assignFileId();
         Assertions.assertNotNull(assignedFileId);
         Assertions.assertEquals(1, assignedFileId.getCount());
@@ -43,13 +46,14 @@ class WeedClientServiceTest {
     }
 
     @Test
-    void assignFileIdWithParam() throws IOException {
-        Map<String, String> param = new HashMap<>();
-        param.put("replication", "001");
-        param.put("count", "2");
-//        param.put("dataCenter", "dataCenter");
-//        param.put("ttl", "3m");
-//        param.put("collection", "test");
+    @Order(2)
+    void assignFileIdWithParam() {
+        AssignFileIdParam param = new AssignFileIdParam();
+        param.setReplication("001");
+        param.setCount(2);
+//        param.setDataCenter("dataCenter");
+//        param.setTtl("3m");
+//        param.setCollection("test");
         AssignedFileId assignedFileId = weedClientService.assignFileId(param);
 
         Assertions.assertNotNull(assignedFileId);
@@ -61,7 +65,8 @@ class WeedClientServiceTest {
     }
 
     @Test
-    void lookupVolume() throws IOException {
+    @Order(3)
+    void lookupVolume() {
         String volumeId = "21";
         VolumeLocation location = weedClientService.lookupVolume(volumeId);
 
@@ -70,6 +75,7 @@ class WeedClientServiceTest {
     }
 
     @Test
+    @Order(4)
     void upload() throws IOException {
         FileOutputStream fos = null;
         PrintStream printStream = null;
@@ -81,7 +87,7 @@ class WeedClientServiceTest {
             fos.close();
             printStream.close();
 
-            FileInfo fileInfo = weedClientService.upload(testFile);
+            FileInfo fileInfo = weedClientService.write(testFile);
 
             Assertions.assertNotNull(fileInfo);
             Assertions.assertEquals("test_upload_file.txt", fileInfo.getFileName());
@@ -98,9 +104,10 @@ class WeedClientServiceTest {
     }
 
     @Test
-    void uploadWithFileName() throws IOException {
+    @Order(5)
+    void uploadWithFileName() {
         File testFile = new File("test.png");
-        FileInfo fileInfo = weedClientService.upload("app.png",testFile);
+        FileInfo fileInfo = weedClientService.write("app.png", testFile);
 
         Assertions.assertNotNull(fileInfo);
         Assertions.assertEquals("app.png", fileInfo.getFileName());
@@ -112,14 +119,22 @@ class WeedClientServiceTest {
     }
 
     @Test
-    void testUpload() {
-    }
-
-    @Test
-    void fileStream() {
-    }
-
-    @Test
+    @Order(999)
     void fileInfo() {
+        List<FileInfo> collect = new ArrayList<>();
+        for (String s : fileUploaded) {
+            FileInfo fileInfo = weedClientService.fileInfo(s);
+            collect.add(fileInfo);
+        }
+
+        for (FileInfo fileInfo : collect) {
+            Assertions.assertNotNull(fileInfo);
+            Assertions.assertNotNull(fileInfo.getFileId());
+            Assertions.assertNotNull(fileInfo.getFileId());
+            Assertions.assertTrue(fileInfo.getSize() > 0, "file size:" + fileInfo.getSize());
+            Assertions.assertNotNull(fileInfo.getFileName());
+            Assertions.assertNotNull(fileInfo.getContentType());
+            Assertions.assertNotNull(fileInfo.getLastModified());
+        }
     }
 }
